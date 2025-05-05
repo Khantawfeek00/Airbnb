@@ -1,0 +1,58 @@
+package com.tk.airbnb.Airbnb.Service;
+
+import com.tk.airbnb.Airbnb.DTO.ProfileUpdateRequestDTO;
+import com.tk.airbnb.Airbnb.DTO.UserDTO;
+import com.tk.airbnb.Airbnb.Exception.ResourceNotFoundException;
+import com.tk.airbnb.Airbnb.Model.User;
+import com.tk.airbnb.Airbnb.Repository.UserRepository;
+import com.tk.airbnb.Airbnb.Service.Interfaces.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import static com.tk.airbnb.Airbnb.Util.AppUtils.getCurrentUser;
+
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class UserServiceImpl implements UserService, UserDetailsService {
+
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+
+    @Override
+    public User getUserById(Long id) {
+        log.info("Getting user with ID: {}", id);
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+
+    @Override
+    public void updateProfile(ProfileUpdateRequestDTO profileUpdateRequestDto) {
+        log.info("Updating the profile of the current user with ID: {}", getCurrentUser().getId());
+        User user = getCurrentUser();
+
+        if (profileUpdateRequestDto.getDateOfBirth() != null)
+            user.setDateOfBirth(profileUpdateRequestDto.getDateOfBirth());
+        if (profileUpdateRequestDto.getName() != null) user.setName(profileUpdateRequestDto.getName());
+        if (profileUpdateRequestDto.getGender() != null) user.setGender(profileUpdateRequestDto.getGender());
+        userRepository.save(user);
+        log.info("Updated the profile of the current user with ID: {}", getCurrentUser().getId());
+    }
+
+    @Override
+    public UserDTO getMyProfile() {
+        log.info("Getting the profile of the current user with ID: {}", getCurrentUser().getId());
+        User user = getCurrentUser();
+        return modelMapper.map(user, UserDTO.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+}

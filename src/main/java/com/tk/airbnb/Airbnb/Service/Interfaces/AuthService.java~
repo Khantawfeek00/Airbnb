@@ -1,0 +1,12 @@
+package com.tk.airbnb.Airbnb.Service.Interfaces;
+
+import com.tk.airbnb.Airbnb.DTO.LoginDTO;
+import com.tk.airbnb.Airbnb.DTO.SignUpRequestDTO;
+
+public interface AuthService {
+    UserDTO signUp(SignUpRequestDTO signUpRequestDTO);
+
+    String[] login(LoginDTO loginDTO);
+
+    String refreshToken(String refreshToken);
+}
