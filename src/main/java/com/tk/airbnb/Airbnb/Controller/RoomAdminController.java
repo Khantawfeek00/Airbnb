@@ -24,7 +24,7 @@ public class RoomAdminController {
     @PostMapping
     @Operation(summary = "Create a new room",
             description = "Adds a new room to a specific hotel")
-    public ResponseEntity<RoomDTO> createNewRoom(@PathVariable Long hotelId, @PathVariable RoomDTO roomDTO) {
+    public ResponseEntity<RoomDTO> createNewRoom(@PathVariable Long hotelId, @RequestBody RoomDTO roomDTO) {
         RoomDTO room = roomService.createNewRoom(hotelId, roomDTO);
         return new ResponseEntity<>(room, HttpStatus.CREATED);
     }
@@ -53,7 +53,7 @@ public class RoomAdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/{roomId}")
     @Operation(summary = "Update a room",
             description = "Updates the details of an existing room", tags = {"Admin Inventory"})
     public ResponseEntity<RoomDTO> updateRoomById(@PathVariable Long hotelId, @PathVariable Long roomId, @RequestBody RoomDTO roomDTO) {

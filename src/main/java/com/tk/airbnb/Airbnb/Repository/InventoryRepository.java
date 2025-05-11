@@ -49,8 +49,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
                 AND (i.totalCount - i.bookCount - i.reservedCount) >= :roomsCount
             """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<Inventory> findAndLockAvailableInventory(@Param("roomId") Long roomId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("roomsCount") Integer roomsCount);
-
+    List<Inventory> findAndLockAvailableInventory(
+            @Param("roomId") Long roomId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("roomsCount") Integer roomsCount
+    );
     @Modifying
     @Query("""
                 UPDATE Inventory i
@@ -96,4 +100,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
                   AND i.closed = false
             """)
     void confirmBooking(@Param("roomId") Long roomId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("numberOfRooms") int numberOfRooms);
+
+    void deleteByRoom(Room room);
 }
